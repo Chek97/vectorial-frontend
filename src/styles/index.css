@@ -1,3 +1,6 @@
+@import url('./login.css');
+@import url('./register.css');
+
 * {
     padding: 0;
     margin: 0;

@@ -1,0 +1,9 @@
+.title-container {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.title-container > h1 {
+    color: #3D4785;
+    font-weight: bold;
+}
