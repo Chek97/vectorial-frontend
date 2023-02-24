@@ -1,13 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast, { Toaster } from 'react-hot-toast';
 
 export const RegisterPage = () => {
+
+  //localStorage.setItem("user", JSON.stringify(""));
 
   const [form, setForm] = useState({
     username: '',
     email: '',
     password: ''
   });
+  const navigate = useNavigate();
 
   const { username, email, password } = form;
 
@@ -18,25 +22,46 @@ export const RegisterPage = () => {
     });
   }
 
+  const notification = (ok) => ok ? toast.success("!!!Usuario creado con exito!!!", {
+    duration: 3000,
+    position: 'top-center'
+  }) : toast.error("!Error al crear el usuario", {
+    duration: 3000,
+    position: 'top-center'
+  });
+
   const onHandleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const request = await fetch('http://localhost:4000/api/auth/register', {
-        method: 'POST',
-        body: JSON.stringify(form),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      const response = await request.json();
-      console.log(response);
-      localStorage.setItem("user", JSON.stringify({
-        user: response.user,
-        token: response.token
-      }));
 
-    } catch (error) {
-      console.log(error);
+    if(form.username === "" || form.email === "" || form.password === ""){
+      notification(false);
+    }else{
+      try {
+        const request = await fetch('http://localhost:4000/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify(form),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        const response = await request.json();
+  
+        notification(response.ok);
+  
+        localStorage.setItem("user", JSON.stringify({
+          user: response.user,
+          token: response.token
+        }));
+  
+        if (response.ok !== false) {
+          setTimeout(() => {
+            navigate("/users");
+          }, 4000);
+        }
+  
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
@@ -98,6 +123,7 @@ export const RegisterPage = () => {
           <Link to="/" className='redirect-link'>Iniciar Session</Link>
         </div>
       </form>
+      <Toaster />
     </div>
   )
 }

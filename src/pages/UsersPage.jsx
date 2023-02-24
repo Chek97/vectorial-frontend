@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import toast, { Toaster } from 'react-hot-toast';
 
 export const UsersPage = () => {
 
   const [users, setUsers] = useState([]);
   const { token } = JSON.parse(localStorage.getItem("user")) || "";
+
+  const notification = (ok) => ok ? toast.success("!!!Usuario eliminado con exito!!!", {
+    duration: 3000,
+    position: 'top-center'
+  }) : toast.error("No fue posible eliminar al usuario", {
+    duration: 3000,
+    position: 'top-center'
+  });
 
   const onHanldleDelete = async(e, id) => {
     try {
@@ -16,7 +25,7 @@ export const UsersPage = () => {
           }
         });
         const response = await request.json();
-        console.log(response);
+        notification(response.ok);
     } catch (error) {
       console.log(error);
     }
@@ -35,7 +44,7 @@ export const UsersPage = () => {
       setUsers(response.users);
     }
     getUsers();
-  }, [users]);
+  }, []);
 
   return (
     <div className="main-container">
@@ -49,36 +58,41 @@ export const UsersPage = () => {
           </Link>
         </div>
         <div className="list-container">
-          <table className="table table-bordered">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Empresa</th>
-                <th>Email</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                users.map(user => (
-                  <tr key={user._id}>
-                    <td>{user.name}</td>
-                    <td>{user.lastName}</td>
-                    <td>{user.company}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <button className="btn btn-danger" onClick={(e) => onHanldleDelete(e, user._id)}>
-                      <i className="fa fa-trash" aria-hidden="true"></i>
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
+          <div className="table-responsive">
+            <table className="table table-hover">
+              <thead className="table-head">
+                <tr>
+                  <th>#</th>
+                  <th>Nombre</th>
+                  <th>Apellido</th>
+                  <th>Empresa</th>
+                  <th>Email</th>
+                  <th className="text-center"><i className="fa fa-trash" aria-hidden="true"></i></th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  users.map((user, idx) => (
+                    <tr key={user._id}>
+                      <td>{idx + 1}</td>
+                      <td>{user.name}</td>
+                      <td>{user.lastName}</td>
+                      <td>{user.company}</td>
+                      <td>{user.email}</td>
+                      <td>
+                        <button className="btn btn-danger" onClick={(e) => onHanldleDelete(e, user._id)}>
+                        <i className="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+      <Toaster />
     </div>
   )
 }
